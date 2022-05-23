@@ -5,6 +5,6 @@ module.exports = {
     category: "info",
     options : [],
     run : async (client, interaction) => {
-        interaction.followUp("https://github.com/Puppy681Nuff/sbdoggos-passthrough-bot/tree/main/commands is the github link for this project");
+        interaction.followUp("https://github.com/Puppy681Nuff/Suzu is the github link for this project");
     }
 }

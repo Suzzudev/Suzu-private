@@ -11,7 +11,7 @@ module.exports = {
             .addField('Creator', 'PuppyNuff')
             .addField('Version', '1.1.0')
             .addField('Prefix', '.')
-            .addField('github', 'https://github.com/puppynuff/Suzu')
+            .addField('github', 'https://github.com/Puppy681Nuff/Suzu')
             .addField('Discord', 'https://discord.gg/UAHf7bAX')
             .setFooter(`Currently in ${client.guilds.cache.size} guilds`);
         interaction.followUp({embeds : [embed]});
