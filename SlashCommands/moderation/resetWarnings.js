@@ -1,9 +1,7 @@
 const inDb = require('../../indb.js');
-const guildSetup = require('../../schema/setUpGuild.js');
+const guild = require('../../schema/guild.js');
 const updateSchema = require('../../schema/update-schema');
 const { Permissions } = require('discord.js');
-const setUpGuild = require('../../schema/setUpGuild');
-
 module.exports = {
     name : "resetwarnings",
     description : "Resets the warnings of a user",
@@ -31,7 +29,7 @@ module.exports = {
 
         if(!response) {
             interaction.followUp("The database is not setup for this server, setting it up now, and no members have any warnings");
-            return guildSetup.setup(interaction, false);
+            return guild.setup(interaction, false);
         }
 
         var members = response.members;
@@ -50,7 +48,7 @@ module.exports = {
 
         if(!found) {
             interaction.followUp("They don't exist? \nReloading the database, then try again");
-            setUpGuild.update(interaction, client);
+            Guild.reload(interaction, client);
             return;
         } else {
             interaction.followUp("Warnings reset for " + target.username);

@@ -40,6 +40,17 @@ module.exports = {
         }
 
         return false;
+    },
+
+    command : async function targetInDb(user){
+        const id = user.id;
+        const response = await userSchema.findOne ({
+            userID : id
+        });
+        if (response != null && response.userID == id) {
+            return response;
+        }
+        return false;
     }
 
 }

@@ -1,7 +1,7 @@
 const { MessageAttachment } = require("discord.js")
 const client = require('../index.js');
 const inDb = require('../indb');
-const setUp = require('../schema/setUpGuild')
+const setUp = require('../schema/guild')
 
 const Canvas = require('canvas');
 

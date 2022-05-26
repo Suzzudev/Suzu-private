@@ -27,35 +27,40 @@ module.exports = {
                 description : "Sends the vent message anonymously to the vent channel",
                 options : "message : The message to send\nlog : Whether or not to log the message (pm to you)",
                 examples : "/anonymousvent message\n/anonymousvent message log:true",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : 'github',
                 description : "Sends someone the github link for this project",
                 options : "none",
                 examples : "/github",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "help",
                 description : "Shows the help menu",
                 options : "command : The command to show how it works",
                 examples : "/help help\n/help guild-config",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "list-blacklist",
                 description : "Lists the blacklisted users",
                 options : "none",
                 examples : "/list-blacklist",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "networth",
-                description : "Sends the users networth",
+                description : "Sends the users networth (Currently down)",
                 options : "user : The players username",
                 examples : "/networth (minecraft username)",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "ban",
@@ -71,7 +76,8 @@ module.exports = {
                 options : "amount : The amount of messages to clear",
                 examples : "/clear 10",
                 permissions : "MANAGE_MESSAGES",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "mananage messages"
             },
             {
                 name : "kick",
@@ -94,7 +100,8 @@ module.exports = {
                 description : "Reloads the guild database",
                 options : "none",
                 examples : "/reloadGuild",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "admin"
             },
             {
                 name : "remove-role",
@@ -109,49 +116,56 @@ module.exports = {
                 description : "Warns a user",
                 options : "user : The user to warn",
                 examples : "/warn @user",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "MANAGE_ROLES, KICK_MEMBERS, BAN_MEMBERS"
             },
             {
                 name : "lyrics",
                 description : "Sends the lyrics of a song",
                 options : "song : The song to send the lyrics for",
                 examples : "/lyrics\n/lyrics song",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "play",
                 description : "Plays a song",
                 options : "song : The song to play",
                 examples : "/play\n/play song",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "pause",
                 description : "Pauses the current song",
                 options : "none",
                 examples : "/pause",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "resume",
                 description : "Resumes the current song",
                 options : "none",
                 examples : "/resume",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "skip",
                 description : "skips the current song",
                 options : "none",
                 examples : "/skip",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name : "volume",
                 description : "Changes the volume of the current song",
                 options : "volume : The volume to change the song to",
                 examples : "/volume\n/volume volume",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
             },
             {
                 name: "status",
@@ -174,21 +188,32 @@ module.exports = {
                 description : "Removes a user from the blacklist",
                 options : "user : The user to remove from the blacklist",
                 examples : "/blacklist-remove @user",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "Owner only"
             },
             {
                 name : "blacklist",
                 description : "Adds a user to the blacklist",
                 options : "user : The user to add to the blacklist",
                 examples : "/blacklist @user",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "Owner only"
             },
             {
                 name : "info",
                 description : "Gets information about the bot",
                 options : "none",
                 examples : "/info",
-                aliases : "aliases not set up yet"
+                aliases : "aliases not set up yet",
+                permissions : "none"
+            },
+            {
+                name : "unwarn",
+                description : "Unwarns a user",
+                options : "user : The user to unwarn",
+                examples : "/unwarn @user",
+                aliases : "aliases not set up yet",
+                permissions : "MANAGE_ROLES, KICK_MEMBERS, BAN_MEMBERS"
             }
         ];  
         var command = interaction.options.getString('command');
@@ -197,7 +222,7 @@ module.exports = {
         for(i = 0; i < help.length; i++) {
             if(help[i].name == command) {
 
-                if(help[i].permmisions == undefined) {
+                if(help[i].permissions == undefined) {
                     help[i].permissions = "None or not defined";
                 }
                     

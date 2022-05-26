@@ -1,8 +1,8 @@
 const inDb = require('../../indb.js');
-const guildSetup = require('../../schema/setUpGuild.js');
+const guildSetup = require('../../schema/guild.js');
 const updateSchema = require('../../schema/update-schema');
 const { Permissions } = require('discord.js');
-const setUpGuild = require('../../schema/setUpGuild');
+const guild = require('../../schema/guild');
 
 module.exports = {
     name : "warn",
@@ -18,8 +18,8 @@ module.exports = {
 
     run : async (client, interaction) => {
         const target = interaction.options.getUser('target');
-        if(!interaction.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)) {
-            interaction.followUp("You do not have permission to reset warnings");
+        if(!interaction.member.permissions.has(Permissions.FLAGS.MANAGE_ROLES && Permissions.FLAGS.KICK_MEMBERS && Permissions.FLAGS.BAN_MEMBERS)) {
+            interaction.followUp("You do not have permission to reset warnings, and if you are a moderator, get the owner to give you these permissions : \nManage Roles (For muting members)\nKick Members (For kicking members)\nBan Members (For banning members)\n Reason : The punishments go between those three.");
             return;
         }
 
@@ -53,7 +53,7 @@ module.exports = {
 
         if(!found) {
             interaction.followUp("They don't exist? \nReloading the database, then try again");
-            setUpGuild.update(interaction, client);
+            guild.reload(interaction, client);
             return;
         }
 
@@ -61,12 +61,12 @@ module.exports = {
             if(response.firstWarningPunishment == "kick") {
                 const user = interaction.guild.members.cache.get(target.id);
                 user.kick();
-                setUpGuild.update(interaction, client);
+                guild.reload(interaction, client);
                 interaction.followUp(`You might want to run the /reloadguild command to reload the members list`);
             } else if(response.firstWarningPunishment == "ban") {
                 const user = interaction.guild.members.cache.get(target.id);
                 user.ban();
-                setUpGuild.update(interaction, client);
+                guild.reload(interaction, client);
                 interaction.followUp(`You might want to run the /reloadguild command to reload the members list`);
             } else if(response.firstWarningPunishment == "mute") {
                 if(!response.muteRole) {
@@ -87,12 +87,12 @@ module.exports = {
             if(response.secondWarningPunishment == "kick") {
                 const user = interaction.guild.members.cache.get(target.id);
                 user.kick();
-                setUpGuild.update(interaction, client);
+                guild.reload(interaction, client);
                 interaction.followUp(`You might want to run the /reloadguild command to reload the members list`);
             } else if(response.secondWarningPunishment == "ban") {
                 const user = interaction.guild.members.cache.get(target.id);
                 user.ban();
-                setUpGuild.update(interaction, client);
+                guild.reload(interaction, client);
                 interaction.followUp(`You might want to run the /reloadguild command to reload the members list`);
             } else if(response.secondWarningPunishment == "mute") {
                 if(!response.muteRole) {

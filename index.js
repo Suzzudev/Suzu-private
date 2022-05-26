@@ -313,7 +313,7 @@ bot.on('end', () => {
 });
 
 const inDb = require('./indb');
-const setUp = require('./schema/setUpGuild')
+const guild = require('./schema/guild')
 const generateImage = require('./events/generateImage');
 
 module.exports = client;
@@ -324,7 +324,7 @@ client.on('guildMemberAdd', async (member) => {
     const response = await inDb.guild(member.guild.id);
 
     if (!response) {
-        setUp.setup(member, true);
+        guild.setup(member, true);
     }
 
     if(!response.welcomeChannel) {

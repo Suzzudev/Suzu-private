@@ -1,5 +1,5 @@
 const indb = require('../../indb')
-const guildSetUp = require('../../schema/setUpGuild')
+const guild = require('../../schema/guild')
 
 module.exports = {
     name : "reloadguild",
@@ -9,9 +9,9 @@ module.exports = {
 
         if(!response) {
             interaction.followUp("The database is not setup for this server, setting it up now,");
-            return guildSetUp.setup(interaction, false);
+            return guild.setup(interaction, false);
         }
-        guildSetUp.update(interaction, client);
+        guild.reload(interaction, client);
         interaction.followUp("Database reloaded");
     }
 }

@@ -64,7 +64,9 @@ module.exports = {
             .setThumbnail(target.displayAvatarURL())
             .setFooter(`Muted by ${interaction.member.tag}`);
 
-        logChannel.send(embed);
+        if(logChannel) {
+            logChannel.send(embed);
+        }
     }
 
 }

@@ -15,7 +15,8 @@ const schema = new mongo.Schema({
     welcomeImageMarigin : Number,
     welcomeImageAvatarX : Number,
     welcomeImageAvatarY : Number,
-    welcomeImageAvatarSize : Number
+    welcomeImageAvatarSize : Number,
+    tempBans : Array
 });
 
 module.exports = mongo.model('guild', schema);
