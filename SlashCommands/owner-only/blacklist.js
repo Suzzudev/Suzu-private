@@ -1,5 +1,5 @@
 const user = require('../../schema/user');
-const inDb = require('../../inDb');
+const inDb = require('../../indb');
 
 module.exports = {
     name : "blacklist",
