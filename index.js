@@ -337,6 +337,15 @@ bot.on('message', async (msg) => {
         return logChannel.send({ embeds: [joinedEmbed] });
     }
 
+    if(string.includes('/networth')) {
+        if(hasRank == true) {
+            return getNetworth(args[3]);
+        }
+        else {
+            return getNetworth(args[1]);
+        }
+    }
+
     //When someone leaves the server
     if (string.includes('left.')) {
         const leftEmbed = new MessageEmbed()
@@ -405,4 +414,60 @@ runCalculation = async (uuid, api_key, option, chat) => {
     const { data } = await axios.get(`https://hypixel-api.senither.com/v1/profiles/${uuid}/${option}?key=${api_key}`);
 
     return bot.chat(`/${chat} ${data.data.username} has a weight of ${Math.round(data.data.weight)} on ${data.data.name}`);
+}
+
+async function getNetworth(username) {
+    const uuid = mojangAPI.nameToUuid(username, function(err, res) {
+        if (err) {
+            console.log(err);
+        }
+        runNetworthCalculation(res[0].id, username);
+    })
+}
+
+runNetworthCalculation = async (uuid, username) => {
+    const { data } = await axios.get(`https://api.hypixel.net/skyblock/profiles?key=${config.api_key}&uuid=${uuid}`);
+
+    const activeProfile = getActiveProfile(data.profiles, uuid);
+
+    
+    const profile = activeProfile.members[uuid];
+    profile.banking = activeProfile.banking;
+
+    
+    var success = true;
+
+    var response = await axios.post('https://skyblock.acebot.xyz', { data: profile }).catch(err => {
+        console.log(err);    
+        success = false;
+    }); 
+    if(success == false) {
+        
+        var response = await axios.post('https://maro.skybrokers.xyz/api/networth/categories', { data: profile }).catch(err => {
+            console.log(err);
+            success = false;
+        });
+
+    }
+
+    if(success == false) {
+        return bot.chat('/gc Error: Could not connect to the networth API');
+    }
+
+    var total = response.data.data.networth;
+
+    var total = seperator(total);
+
+    return bot.chat(`/gc ${username} has a networth of ${total}`);
+}
+
+function seperator(numb) {
+    var str = numb.toString().split(".");
+    str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return str.join(".");
+}
+
+
+const getActiveProfile = function (profiles, uuid) {
+    return profiles.sort((a,b) => b.members[uuid].last_save - a.members[uuid].last_save)[0];
 }
