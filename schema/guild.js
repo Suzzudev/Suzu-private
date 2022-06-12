@@ -5,7 +5,7 @@ const client = require('../index.js');
 const guildSchema = require('./guild-schema');
 
 module.exports = {
-    setup : async function setupGuild (interaction, welcome) {
+    setup : async function setupGuild (interaction) {
         const guild = client.guilds.cache.get(interaction.guild.id);
 
         const users = await guild.members.fetch();
@@ -18,7 +18,8 @@ module.exports = {
             members.push(
                 {
                     id: memberIds[i],
-                    warnings: 0
+                    warnings: 0,
+                    items : []
                 }
             )
 
@@ -32,10 +33,6 @@ module.exports = {
             finalWarning : "5",
             firstWarningPunishment : "kick",
             secondWarningPunishment : "kick"
-        }
-
-        if(!welcome) {
-            interaction.channel.send("Until you set up a mute role with /guild-config, users will be kicked. You can also change this to ban or keep it as kick with /guild-config");
         }
         const guildModel = new guildSchema(guildData).save();
     },
@@ -54,20 +51,32 @@ module.exports = {
         const memberList = [];
 
         for( i = 0; i < memberIds.length; i++) {
-            const member = user.find(member => member.id == memberIds[i]);
+            var member = user.find(member => member.id == memberIds[i]);
 
             if(!member) { 
                 memberList.push(
                     {
                         id: memberIds[i],
-                        warnings: 0
+                        warnings: 0,
+                        items: [],
+                        money : 0,
+                        level : 1,
+                        xp : 0,
+                        bank : 0,
+                        dailyDice : 3
                     }
                 )
             }
             else {
                 memberList.push({
                     id :  member.id,
-                    warnings : member.warnings
+                    warnings : member.warnings,
+                    items : member.items,
+                    money : member.money,
+                    level: member.level,
+                    xp: member.xp,
+                    bank: member.bank,
+                    dailyDice: member.dailyDice
                 });
             }
 

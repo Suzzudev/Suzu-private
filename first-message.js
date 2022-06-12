@@ -24,4 +24,4 @@ const addReactions = (message, reactions) => {
         }
       }
     })
-  }
+  } 

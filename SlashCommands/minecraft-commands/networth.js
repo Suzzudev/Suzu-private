@@ -46,7 +46,7 @@ function separator(numb) {
 const runNetworth = async function(uuid, key, interaction, user) {
     networth = await getNetworth(uuid, key);
 
-    if(networth == false) {
+    if(!networth) {
         return interaction.followUp(`Unable to get networth for ${user}`);
     }
 
