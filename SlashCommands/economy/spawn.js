@@ -1,5 +1,5 @@
 //Schema files
-const inDb = require('../../inDb.js');
+const inDb = require('../../indb.js');
 const guild = require('../../schema/guild');
 const { Permissions } = require('discord.js');
 
