@@ -1,5 +1,4 @@
 {
-<<<<<<< Updated upstream
     "token": "OTA3Mzg1NzYzMTc4NjI3MTQy.G1_fQj.HpF5GOxOdxaYYyrwlThNv8xEaSBaet5Nhihvn0",
     "prefix": ".",
     "api_key": "1cca2ae1-87b7-458f-98f5-3bcde46ada1a",
@@ -9,15 +8,4 @@
     "activity": "A bug broke it ;-;",
     "status": "Status (Online, idle, dnd)",
     "mongolink" : "mongodb+srv://puppynuff:KaArbhaf2had!@database.sgj6x.mongodb.net/test"
-=======
-  "token": "Bot-Token",
-  "prefix": ".",
-  "api_key": "hypixel-api-key",
-  "EMAIL": "minecraft-account-email",
-  "PASWORD": "minecraft-account-password",
-  "ownerID": "your-discord-id",
-  "activity": "Custom-Activity",
-  "status": "Status (Online, idle, dnd)",
-  "mongolink" : "mongodb+srv://username:password@database.sgj6x.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
->>>>>>> Stashed changes
 }
