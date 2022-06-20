@@ -1,6 +1,6 @@
-const client = require("../index");
-const roleClaim = require("../role-claim");
-const config = require("../config.json");
+const client = require("../../index");
+const roleClaim = require("../../role-claim");
+const config = require("../../config.json");
 const fs = require("fs");
 
 client.on("ready", () => {

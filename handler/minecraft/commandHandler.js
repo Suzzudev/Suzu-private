@@ -1,27 +1,38 @@
 const networth = require('./commands/networth');
 const bitches = require('./commands/bitches');
 const weight = require('./commands/weight');
-const parsifal = require('./commands/parsifal')
-const enter = require('./events/partyEvents/CataEnter');
-
+const parsifal = require('./commands/parsifal');
 module.exports = {
     networth: async function(username, bot) {
-        networth.run(username, bot);
+        try {
+            networth.run(username, bot);
+        } catch(err) {
+            console.log(bot.chat('/gc There was an error!'));
+        }
     },
 
     bitches: async function(username, bot) {
-        bitches.run(username, bot);
+        try {
+            bitches.run(username, bot);
+        } catch(err) {
+            console.log(bot.chat('/gc There was an error!'));
+        }
     },
 
     weight: async function(username, bot, chat) {
+        try {
+            networth.run(username, bot);
+        } catch(err) {
+            console.log(bot.chat('/gc There was an error!'));
+        }
         weight.run(username, bot, chat);
     },
 
     parsifal : async function(bot) {
-        parsifal.run(bot);
-    },
-
-    cataEnter: async function(bot) {
-        enter.run(bot);
+        try {
+            parsifal.run(bot);
+        } catch(err) {
+            console.log(bot.chat('/gc There was an error!'));
+        }
     }
 }

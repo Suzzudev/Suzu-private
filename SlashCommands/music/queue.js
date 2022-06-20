@@ -1,4 +1,4 @@
-const player = require('../../handler/client/player');
+const player = require("../../handler/client/player");
 
 module.exports = {
     name: "queue",

@@ -8,7 +8,7 @@ const generateImage = require('./generateImage');
 const axios = require('axios');
 const mojangAPI = require('mojang-api');
 const minecraftHandler = require('./handler/minecraft/commandHandler');
-const commandList = ['/bitches', '/networth', '/weight'];
+
 
 const client = new Client({
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_BANS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING', "GUILD_VOICE_STATES"],
@@ -35,10 +35,10 @@ client.login(client.config.token);
 
 // Creating mineflayer bot
 var options = {
-    version: "1.8.9",
+    version: "1.16.4",
     host: "hypixel.net",
-    username: process.env.EMAIL,
-    password: process.env.PASSWORD,
+    username: process.env.EMAIL || config.EMAIL,
+    password: process.env.PASSWORD || config.PASSWORD,
     auth: "microsoft"
 }
 var bot = mineflayer.createBot(options);
@@ -65,11 +65,6 @@ bot.on('error', (err) => {
 //when the bot logs in
 bot.on('login', () =>{
     bot.chat("/limbo");
-    bot.chat("/p leave");
-})
-const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
-bot.once('spawn', () => {
-  mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
 })
 
 //When the bot stops
@@ -85,6 +80,7 @@ bot.on('end', () => {
 client.on('guildMemberAdd', async (member) => {
 
     const response = await inDb.guild(member.guild.id);
+
     if (!response) {
         guild.setup(member, true);
     }
@@ -253,12 +249,6 @@ bot.on('message', async (msg) => {
     } else {
         hasRank = false;
     }
-
-    if(string.includes('...Follow...')) {
-        followPlayer();
-    }
-
-    
     //When someone unmutes someone else
     if (string.includes('has unmuted') && guildMessage == false) {
         logChannel.send(string);
@@ -269,8 +259,9 @@ bot.on('message', async (msg) => {
         bot.chat("/g unmute PuppyNuff");
     }
 
+
     if(string.includes("has muted _Hakari") && guildMessage == false) {
-        bot.chat("/g unmute _hakari");
+        bot.chat("/g unmute _Hakari");
     }
 
     //When someone invites the bot to a party
@@ -355,7 +346,6 @@ bot.on('message', async (msg) => {
         if(hasRank == true) {
             minecraftHandler.bitches(args[3], bot);
         }
-
         minecraftHandler.bitches(args[1], bot);
     }
 
@@ -364,15 +354,25 @@ bot.on('message', async (msg) => {
     }
 
     if(string.includes('/networth')) {
+        console.log(args[5]);
         if(hasRank == true) {
-            return minecraftHandler.networth(args[3], bot);
+            console.log(args[5]);
+            if(!args[6]) {
+                return minecraftHandler.networth(args[3], bot);
+            }
+
+            return minecraftHandler.networth(args[6], bot);
         }
         else {
-            return minecraftHandler.networth(args[1], bot);
+            if(!args[5]) {
+                return minecraftHandler.networth(args[2], bot);
+            }
+
+            return minecraftHandler.networth(args[4], bot);
         }
     }
-    
-    string = string.replace("Guild >" , "");
+
+    string = string.replace("Guild >", "");
 
     if(args[2] == "_Hakari") {
         return;

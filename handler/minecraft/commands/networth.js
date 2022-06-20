@@ -1,17 +1,11 @@
-const mojangApi = require("mojang-api");
-const axios = require('axios');
+const mojangAPI = require('mojang-api');
+const axios = require('axios')
 const config = require('../../../config.json');
 
-async function run(username, bot) {
-    const networth = await getNetworth(username, bot);
-}
-
-async function getNetworth(username, bot) {
-    const uuid = mojangApi.nameToUuid(username, function(err, res) {
-        if(err) {
-            console.error(err);
-        }
-
+async function run (username, bot) {
+    mojangAPI.nameToUuid(username, (err, res) => {
+        if(err) return console.log(err);
+        if(!res[0]) return bot.chat('/gc Error: Could not find the player.');
         networthCalculator(res[0].id, username, bot);
     })
 }
@@ -22,28 +16,20 @@ const getActiveProfile = function (profiles, uuid) {
 
 networthCalculator = async function(uuid, username, bot) {
     const { data } = await axios.get(`https://api.hypixel.net/skyblock/profiles?key=${config.api_key}&uuid=${uuid}`);
-
+    if(!data.profiles) return bot.chat(`/gc Error: Couldn't get profiles for this player.`);
     const profiles = data.profiles;
-
     const activeProfile = getActiveProfile(data.profiles, uuid);
-
     const profile = activeProfile.members[uuid];
     profile.banking = activeProfile.banking;
-
     var success = true;
-
-    const response = await axios.post('https://skyblock.acebot.xyz/api/networth/categories', { data: profile}).catch(err => {
+    var response = await axios.post('https://skyblock.acebot.xyz/api/networth/categories', { data: profile}).catch(err => {
         success = false;
-        console.log(err);
     });
-    if(!success) return bot.chat('/gc Error: Could not connect to the API.');
 
+    if(!success) return bot.chat(`/gc Error: Couldn't get networth for this player. (Probably has inventory api disabled)`);
     var total = response.data.data.networth + response.data.data.bank + response.data.data.purse;
-
     total = Math.round(total);
-
     var total = seperator(total);
-
     return bot.chat(`/gc ${username} has a networth of ${total}`);
 }
 
@@ -52,7 +38,6 @@ function seperator(numb) {
     str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return str.join(".");
 }
-
 module.exports = {
     run: run
 };
