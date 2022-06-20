@@ -7,7 +7,8 @@ const guild = require('./schema/guild');
 const generateImage = require('./generateImage');
 const axios = require('axios');
 const mojangAPI = require('mojang-api');
-
+const minecraftHandler = require('./handler/minecraft/commandHandler');
+const commandList = ['/bitches', '/networth', '/weight'];
 
 const client = new Client({
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_BANS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING', "GUILD_VOICE_STATES"],
@@ -21,7 +22,7 @@ mongo.connection.on('connected', () => {
     console.log('Connected to database');
 })
 
-const category = {};
+var queue = [];
 
 //Gobal Variables
 client.commands = new Collection();
@@ -34,15 +35,10 @@ client.login(client.config.token);
 
 // Creating mineflayer bot
 var options = {
-    //Version
-    version: "1.16.4",
-    //Server
+    version: "1.8.9",
     host: "hypixel.net",
-    //username
-    username: process.env.EMAIL || config.EMAIL,
-    //password
-    password: process.env.PASSWORD || config.PASSWORD,
-    //Authentication method
+    username: process.env.EMAIL,
+    password: process.env.PASSWORD,
     auth: "microsoft"
 }
 var bot = mineflayer.createBot(options);
@@ -69,6 +65,11 @@ bot.on('error', (err) => {
 //when the bot logs in
 bot.on('login', () =>{
     bot.chat("/limbo");
+    bot.chat("/p leave");
+})
+const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
+bot.once('spawn', () => {
+  mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
 })
 
 //When the bot stops
@@ -84,7 +85,6 @@ bot.on('end', () => {
 client.on('guildMemberAdd', async (member) => {
 
     const response = await inDb.guild(member.guild.id);
-
     if (!response) {
         guild.setup(member, true);
     }
@@ -116,70 +116,8 @@ client.on('guildMemberAdd', async (member) => {
     });
 });
 
-var isMod = false;
-
 // Discord - minecraft chat
 client.on('messageCreate', async (message) => {
-
-    if (!message.channel.id == "878026030877663262") {
-
-        var arg = message.content.substring(prefix.length).split(" ");
-
-        if (!message.startsWith(prefix)) return;
-        if (!message.guild.id != "843568795620606012") return;
-
-        //Switch - case Function
-        switch (arg[0].toLowerCase()) {
-            case 'gmute':
-                if (!isMod == true) return message.reply('You do not have permission to use this command.');
-
-                mess = message.content.toString();
-                mess = mess.replace(".gmute", "");
-                bot.chat(`/g mute ${mess}`);
-                break;
-
-            case 'gunmute':
-                if (!isMod == true) return message.reply('You do not have permission to use this command.');
-
-                mess = message.content.toString();
-                mess = mess.replace(".gunmute", "");
-                bot.chat(`/g unmute ${mess}`);
-                break;
-
-            case 'gkick':
-                if (!isMod == true) return message.reply('You do not have permission to use this command.');
-
-                mess = message.content.toString();
-                mess = mess.replace(".gkick", "");
-                bot.chat(`/g kick ${mess}`);
-                break;
-
-            case 'gaccept':
-                if (!isMod == true) return message.reply('You do not have permission to use this command.');
-
-                mess = message.content.toString();
-                mess = mess.replace(".gaccept", "");
-                bot.chat(`/g accept ${mess}`);
-                break;
-        }
-        if (
-            message.author.bot ||
-            !message.guild ||
-            !message.content.toLowerCase().startsWith(client.config.prefix)
-        )
-            return;
-
-        const [cmd, ...args] = message.content
-            .slice(client.config.prefix.length)
-            .trim()
-            .split(/ +g/);
-
-        const command = client.commands.get(cmd.toLowerCase()) || client.commands.find(c => c.aliases?.includes(cmd.toLowerCase()));
-
-        if (!command) return;
-        return await command.run(client, message, args);
-    }
-
     if (message.channel.id != "878026030877663262") return;
 
     if (message.author.bot) return;
@@ -192,7 +130,7 @@ client.on('messageCreate', async (message) => {
         return;
     }
 
-    bot.chat(`/gc ${message.author.username} ${message.content}`);
+    bot.chat(`/gc ${message.author.username}: ${message.content}`);
 
 })
 
@@ -228,20 +166,24 @@ bot.on('message', async (msg) => {
     } else {
         hasRank = false;
     }
+
+    if(string.includes('...Follow...')) {
+        followPlayer();
+    }
+
+    
     //When someone unmutes someone else
     if (string.includes('has unmuted') && guildMessage == false) {
         logChannel.send(string);
     }
 
-    //When the bot is muted
-    if (string.includes("You're currently muted for") && guildMessage == false) {
-        bot.chat("/g unmute _Hakari");
-        messageChannel.send("Please try sending that again, the bot was unmuted.");
-    }
-
     //If I was muted
     if (string.includes("has muted [MVP+] PuppyNuff") && guildMessage == false) {
         bot.chat("/g unmute PuppyNuff");
+    }
+
+    if(string.includes("has muted _Hakari") && guildMessage == false) {
+        bot.chat("/g unmute _hakari");
     }
 
     //When someone invites the bot to a party
@@ -261,6 +203,8 @@ bot.on('message', async (msg) => {
             return;
         }
 
+        queue.push(args[1]);
+
         return bot.chat(`/msg ${args[1]} The bot is already in a party, sorry!`);
     }
 
@@ -269,18 +213,12 @@ bot.on('message', async (msg) => {
 
         if (hasRank == true) {
             username = args[1];
-            getWeight(username, "weights", "oc");
-            const requestEmbed = new MessageEmbed()
-                .setAuthor(`${args[1]}`, `https://mc-heads.net/avatar/${args[1]}`, `https://sky.shiiyu.moe/stats/${args[1]}`)
-                .addField(`Join request`, `${string}`)
-                .addField(`Command`, `To accept them do .gaccept ${args[1]}`)
-            requestsChannel.send({embeds : [requestEmbed]});
+            minecraftHandler.weight(username, bot, "oc");
             return;
         }
-        console.log(args[0]);
         username = args[0];
-        console.log(username);
-        getWeight(username, "weights", "oc");
+        username = username.replace("-", "");
+        minecraftHandler.weight(username, bot, "oc");
     }
 
     //When someone does join the guild
@@ -299,175 +237,56 @@ bot.on('message', async (msg) => {
     //When someone disbands the party
     if (string.includes('disbanded') && guildMessage == false) {
         inParty = false;
+        bot.chat(`/p ${queue[0]}`);
+    }
+
+    if(string.includes("joined the party.") && guildMessage == false) {
+        inParty = true;
+        bot.chat(`/p transfer ${queue[0]}`);
+        queue = queue.shift();
+        console.log(queue);
     }
 
     //When someone goes into a dungeon
     if (string.includes('entered The Catacombs') && guildMessage == false) {
         bot.chat("/p leave");
         inParty = false;
+        bot.chat(`/p ${queue[0]}`);
     }
 
     if (guildMessage == false) return;
 
-    //If someone chats /profile
-    if (string.includes('/profile')) {
-        if (hasRank == true) {
-            return bot.chat(`/gc sky.shiiyu.moe/stats/${args[3]} is ${args[3]}'s profile.`);
-        }
-
-        bot.chat(`profile stats for ${args[1]} is https://sky.shiiyu.moe/stats/${args[2]} is ${args[2]}'s profile.`);
-    }
-
     if(string.includes('/weight')) {
         if(hasRank == true) {
-            return getWeight(args[3], "last_saved", "gc");
+            return minecraftHandler.weight(args[3], bot, "gc");
         }
 
-        return getWeight(args[1], "last_saved", "gc");
+        return minecraftHandler.weight(args[1], bot, "gc");
     }
 
-    //If someone logs onto the server
+    if(string.includes('/bitches')) {
+        if(hasRank == true) {
+            minecraftHandler.bitches(args[3], bot);
+        }
 
-    if (string.includes('joined.')) {
-        const joinedEmbed = new MessageEmbed()
-            .setTitle("Guild Member Joined")
-            .addField("Member", args[2])
-            .setThumbnail(`https://sky.shiiyu.moe/stats/${args[2]}`)
-            .setColor("55FF55");
-        return logChannel.send({ embeds: [joinedEmbed] });
+        minecraftHandler.bitches(args[1], bot);
     }
 
     if(string.includes('/networth')) {
         if(hasRank == true) {
-            return getNetworth(args[3]);
+            return minecraftHandler.networth(args[3], bot);
         }
         else {
-            return getNetworth(args[1]);
+            return minecraftHandler.networth(args[1], bot);
         }
     }
+    
+    string = string.replace("Guild >" , "");
 
-    //When someone leaves the server
-    if (string.includes('left.')) {
-        const leftEmbed = new MessageEmbed()
-            .setTitle(`Guild Member Left`)
-            .addField(`Message : `, `${string}`)
-            .setThumbnail(`https://mc-heads.net/head/${args[2]}`)
-            .setColor('55ff55');
-        return logChannel.send({ embeds: [leftEmbed] });
+    if(args[2] == "_Hakari") {
+        return;
     }
 
-
-    //If they have the VIP rank
-    if (string.includes('[VIP]') || string.includes('[VIP+]')) {
-        const vipEmbed = new MessageEmbed()
-            .setAuthor(`${args[3]}`, `https://mc-heads.net/avatar/${args[3]}`, `https://sky.shiiyu.moe/stats/${args[3]}`)
-            .setTitle(`${args[3]}`)
-            .addField(`Message : `, `${msg}`)
-            .setColor('55ff55');
-        logChannel.send({ embeds: [vipEmbed] });
-        return messageChannel.send({ embeds: [vipEmbed] });
-    }
-
-    //If they have the MVP or MVP+ rank
-    if (string.includes('[MVP]') || string.includes('[MVP+]')) {
-        const mvpEmbed = new MessageEmbed()
-            .setAuthor(`${args[3]}`, `https://mc-heads.net/avatar/${args[3]}`, `https://sky.shiiyu.moe/stats/${args[3]}`)
-            .setTitle(`${args[3]}`)
-            .addField(`Message : `, `${msg}`)
-            .setColor('00AAAA');
-        logChannel.send({ embeds: [mvpEmbed] });
-        return messageChannel.send({ embeds: [mvpEmbed] });
-    }
-
-    //If they have the MVP++ rank
-    if (string.includes('MVP++')) {
-        const mvpPlusEmbed = new MessageEmbed()
-            .setAuthor(`${args[3]}`, `https://mc-heads.net/avatar/${args[3]}`, `https://sky.shiiyu.moe/stats/${args[3]}`)
-            .setTitle(`${args[3]}`)
-            .addField(`Message : `, `${msg}`)
-            .setColor('FFAA00');
-        logChannel.send({ embeds: [mvpPlusEmbed] });
-        return messageChannel.send({ embeds: [mvpPlusEmbed] });
-    }
-
-    //If they don't have a rank
-    const noRankEmbed = new MessageEmbed()
-        .setAuthor(`${args[2]}`, `https://mc-heads.net/avatar/${args[2]}`, `https://sky.shiiyu.moe/stats/${args[2]}`)
-        .setTitle(`${args[2]}`)
-        .addField(`Message : `, `${msg}`)
-        .setColor('151515');
-    logChannel.send({ embeds: [noRankEmbed] });
-    return messageChannel.send({ embeds: [noRankEmbed] });
+    messageChannel.send(string);
+    return logChannel.send(string);
 })
-
-async function getWeight(username, option, chat) {
-    console.log(username);
-    const uuid = mojangAPI.nameToUuid(username, function(err, res) {
-        if (err) {
-            console.log(err);
-        }
-        runCalculation(res[0].id, config.api_key, option, chat);
-    })
-}
-
-runCalculation = async (uuid, api_key, option, chat) => {
-    const { data } = await axios.get(`https://hypixel-api.senither.com/v1/profiles/${uuid}/${option}?key=${api_key}`);
-
-    return bot.chat(`/${chat} ${data.data.username} has a weight of ${Math.round(data.data.weight)} on ${data.data.name}`);
-}
-
-async function getNetworth(username) {
-    const uuid = mojangAPI.nameToUuid(username, function(err, res) {
-        if (err) {
-            console.log(err);
-        }
-        runNetworthCalculation(res[0].id, username);
-    })
-}
-
-runNetworthCalculation = async (uuid, username) => {
-    const { data } = await axios.get(`https://api.hypixel.net/skyblock/profiles?key=${config.api_key}&uuid=${uuid}`);
-
-    const activeProfile = getActiveProfile(data.profiles, uuid);
-
-    
-    const profile = activeProfile.members[uuid];
-    profile.banking = activeProfile.banking;
-
-    
-    var success = true;
-
-    var response = await axios.post('https://skyblock.acebot.xyz', { data: profile }).catch(err => {
-        console.log(err);    
-        success = false;
-    }); 
-    if(success == false) {
-        
-        var response = await axios.post('https://maro.skybrokers.xyz/api/networth/categories', { data: profile }).catch(err => {
-            console.log(err);
-            success = false;
-        });
-
-    }
-
-    if(success == false) {
-        return bot.chat('/gc Error: Could not connect to the networth API');
-    }
-
-    var total = response.data.data.networth;
-
-    var total = seperator(total);
-
-    return bot.chat(`/gc ${username} has a networth of ${total}`);
-}
-
-function seperator(numb) {
-    var str = numb.toString().split(".");
-    str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return str.join(".");
-}
-
-
-const getActiveProfile = function (profiles, uuid) {
-    return profiles.sort((a,b) => b.members[uuid].last_save - a.members[uuid].last_save)[0];
-}

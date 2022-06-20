@@ -1,5 +1,5 @@
 const { QueryType } = require("discord-player");
-const player = require("../../client/player");
+const player = require("../../handler/client/player");
 
 
 

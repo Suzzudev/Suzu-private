@@ -1,4 +1,4 @@
-const player = require("../../client/player");
+const player = require("../../handler/client/player");
 const axios = require("axios");
 const { MessageEmbed } = require("discord.js");
 
