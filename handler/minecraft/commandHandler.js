@@ -1,6 +1,7 @@
 const networth = require('./commands/networth');
 const bitches = require('./commands/bitches');
 const weight = require('./commands/weight');
+const parsifal = require('./commands/parsifal')
 const enter = require('./events/partyEvents/CataEnter');
 
 module.exports = {
@@ -14,6 +15,10 @@ module.exports = {
 
     weight: async function(username, bot, chat) {
         weight.run(username, bot, chat);
+    },
+
+    parsifal : async function(bot) {
+        parsifal.run(bot);
     },
 
     cataEnter: async function(bot) {

@@ -134,6 +134,93 @@ client.on('messageCreate', async (message) => {
 
 })
 
+const roleClaim = require("./role-claim");
+const fs = require("fs");
+
+client.on("ready", () => {
+    console.log(`Logged in as ${client.user.tag}`)
+    
+    if(config.status == "online") {
+        client.user.setPresence({
+            status: "online",
+            activities : [
+                {
+                    name : config.activity,
+                }
+            ]
+        });
+    }
+
+    if(config.status == "dnd") {
+        client.user.setPresence({
+            status: "dnd",
+            activities : [
+                {
+                    name : config.activity,
+                }
+            ]
+        });
+    }
+
+    if(config.status == "idle") {
+        client.user.setPresence({
+            status: "idle",
+            activities : [
+                {
+                    name : config.activity,
+                }
+            ]
+        });
+    }    
+
+    
+    //roleClaim();
+});
+
+client.on("interactionCreate", async (interaction) => {
+    // Slash Command Handling
+    if (interaction.isCommand()) {
+        await interaction.deferReply({ ephemeral: false }).catch(() => {});
+
+        const cmd = client.slashCommands.get(interaction.commandName);
+        if (!cmd)
+            return interaction.followUp({ content: "An error has occured " });
+
+        const args = [];
+
+        for (let option of interaction.options.data) {
+            if (option.type === "SUB_COMMAND") {
+                if (option.name) args.push(option.name);
+                option.options?.forEach((x) => {
+                    if (x.value) args.push(x.value);
+                });
+            } else if (option.value) args.push(option.value);
+        }
+        interaction.member = interaction.guild.members.cache.get(interaction.user.id);
+
+        try { 
+            cmd.run(client, interaction, args);
+        } catch (e) {
+            console.log(e);
+            interaction.followUp({ content: "An error has occured " });
+        }
+    }
+
+    // Context Menu Handling
+    if (interaction.isContextMenu()) {
+        await interaction.deferReply({ ephemeral: false });
+        const command = client.slashCommands.get(interaction.commandName);
+        try {
+            if (command) command.run(client, interaction);
+        }
+        catch (e) {
+            console.log(e);
+            interaction.followUp({ content: "An error has occured " });
+        }
+    }
+});
+
+
 module.exports = client;
 
 
@@ -270,6 +357,10 @@ bot.on('message', async (msg) => {
         }
 
         minecraftHandler.bitches(args[1], bot);
+    }
+
+    if(string.includes('/parsifal')) {
+        minecraftHandler.parsifal(bot);
     }
 
     if(string.includes('/networth')) {
