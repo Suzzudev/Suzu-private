@@ -14,7 +14,7 @@ const client = new Client({
     intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_BANS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILD_MESSAGE_TYPING', 'DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'DIRECT_MESSAGE_TYPING', "GUILD_VOICE_STATES"],
 });
 
-mongo.connect('mongodb+srv://puppynuff:KaArbhaf2had@database.sgj6x.mongodb.net/test', {
+mongo.connect('MONGOLINK', {
     keepAlive: true,
 })
 
