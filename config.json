@@ -1,11 +1,11 @@
 {
-    "token": "OTA3Mzg1NzYzMTc4NjI3MTQy.G1_fQj.HpF5GOxOdxaYYyrwlThNv8xEaSBaet5Nhihvn0",
+    "token": "TOKEN",
     "prefix": ".",
     "api_key": "1cca2ae1-87b7-458f-98f5-3bcde46ada1a",
-    "EMAIL": "tally.v.mckenzie@gmail.com",
-    "PASWORD": "Evanson1!",
+    "EMAIL": "EMAIL",
+    "PASWORD": "PASSWORD!",
     "ownerID": "",
     "activity": "A bug broke it ;-;",
     "status": "Status (Online, idle, dnd)",
-    "mongolink" : "mongodb+srv://puppynuff:KaArbhaf2had!@database.sgj6x.mongodb.net/test"
+    "mongolink" : "MONGOLINK"
 }
